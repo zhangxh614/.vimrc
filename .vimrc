@@ -27,9 +27,9 @@ set encoding=utf-8
 
 function Compile()
 		if &filetype == 'cpp'
-				exec "!g++ % -o %< -g -Wall -Wextra -Wconversion"
+				exec "!g++ % -o %< -g -Wall -Wextra -Wconversion -O2"
 		elseif &filetype == 'c'
-				exec "!gcc % -o %< -g -Wall -Wextra -Wconversion"
+				exec "!gcc % -o %< -g -Wall -Wextra -Wconversion -O2"
 		elseif &filetype == 'pas'
 				exec "!fpc % -g"
 		elseif &filetype == 'tex'
@@ -76,17 +76,26 @@ set fdm=marker
 set number
 set tabstop=4
 set softtabstop=4
+"Enable folding
+set foldmethod=indent
+set foldlevel=99
+
 autocmd InsertLeave * se nocul
 autocmd InsertEnter * se cul
+
 syntax on
 filetype plugin indent on
+
 imap jj <esc>
-map <F9> : call Compile() <CR>
+nnoremap <space> za
+map <F2> :NERDTreeToggle<CR>
+nmap <F4> :TagbarToggle<CR>
 map <F5> : call Debug() <CR>
 map <F6> : call Run() <CR>
-map <F8> : ! g++ % -o %<.out -O2 <CR>
-map <F12> : ! subl ./% <CR>
 map <F7> : ! python % <CR>
+map <F8> : call Compile() <CR>
+noremap <F9> :Autoformat<CR>
+map <F12> : ! subl ./% <CR>
 nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
 nnoremap <C-L> <C-W><C-L>
@@ -102,21 +111,24 @@ let g:airline_theme="molokai"
 "这个是安装字体后 必须设置此项"
 let g:airline_powerline_fonts = 1
 set laststatus=2
- "打开tabline功能,方便查看Buffer和切换,省去了minibufexpl插件
- let g:airline#extensions#tabline#enabled = 1
- let g:airline#extensions#tabline#buffer_nr_show = 1
+"打开tabline功能,方便查看Buffer和切换,省去了minibufexpl插件
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#buffer_nr_show = 1
 
 "设置切换Buffer快捷键"
- nnoremap <C-tab> :bn<CR>
- nnoremap <C-s-tab> :bp<CR>
- " 关闭状态显示空白符号计数
- let g:airline#extensions#whitespace#enabled = 0
- let g:airline#extensions#whitespace#symbol = '!'
- " 设置consolas字体"前面已经设置过
- "set guifont=Consolas\ for\ Powerline\ FixedD:h11
-  if !exists('g:airline_symbols')
-    let g:airline_symbols = {}
-  endif
+nnoremap <C-tab> :bn<CR>
+nnoremap <C-s-tab> :bp<CR>
+" 关闭状态显示空白符号计数
+let g:airline#extensions#whitespace#enabled = 0
+let g:airline#extensions#whitespace#symbol = '!'
+
+set guifont=Liberation\ Mono\ for\ Powerline\ 10
+
+if !exists('g:airline_symbols')
+		let g:airline_symbols = {}
+endif
+
+let g:airline_symbols.branch = '⎇'
 
 "---------------------------------------------------------------------------
 "vim-NERDTree
@@ -125,7 +137,6 @@ Plugin 'scrooloose/nerdtree'
 let NERDTreeIgnore=['\.pyc$', '\~$'] "ignore files in NERDTree
 let NERDTreeWinPos='left'
 let NERDTreeWinSize=35
-map <F2> :NERDTreeToggle<CR>
 
 "---------------------------------------------------------------------------
 "vim-YouCompleteMe
@@ -174,29 +185,87 @@ let g:ycm_collect_identifiers_from_comments_and_strings = 0
 Bundle 'majutsushi/tagbar'
 let g:tagbar_width=35
 let g:tagbar_autofocus=1
-nmap <F4> :TagbarToggle<CR>
+
 "---------------------------------------------------------------------------
 "vim-solarized
 "---------------------------------------------------------------------------
 colorscheme solarized
 if has('gui_running')
-    set background=light
+		set background=light
 else
-    set background=dark
+		set background=dark
 endif
+
 "---------------------------------------------------------------------------
 "vim-markdown
 "---------------------------------------------------------------------------
 Plugin 'godlygeek/tabular'
 Plugin 'plasticboy/vim-markdown'
 Plugin 'suan/vim-instant-markdown'
+
 "---------------------------------------------------------------------------
 "vim-autoformat
 "---------------------------------------------------------------------------
 Plugin 'Chiel92/vim-autoformat'
-noremap <F3> :Autoformat<CR>:w<CR>
 let g:autmformat_verbosemode=1
-let g:formatter_yapf_style = 'pep8'
-let g:formatdef_google = '"astyle --style=google --pad-oper"'
+let g:formatdef_google = '"astyle --style=google --indent=spaces=4 --pad-oper --suffix=none"'
 let g:formatters_cpp = ['google']
 let g:formatters_c = ['google']
+let g:formatdef_autopep8 ='"autopep8 --in-place --aggressive --aggressive"'
+let g:formatters_python = ['autopep8']
+
+au BufNewFile,BufRead *.py
+						\ set tabstop=4 |
+						\ set softtabstop=4 |
+						\ set shiftwidth=4 |
+						\ set textwidth=79 |
+						\ set expandtab |
+						\ set autoindent |
+						\ set fileformat=unix
+
+" func! FormatCode()
+" exec "w"
+" if &filetype == 'c' || &filetype == 'h'
+" exec "!astyle --style=google --pad-oper  --indent=spaces=4 --suffix=none %"
+" elseif &filetype == 'cpp' || &filetype == 'cc' || &filetype == 'hpp'
+" exec "!astyle --style=google --pad-oper  --indent=spaces=4 --suffix=none %"
+" elseif &filetype == 'perl'
+" exec "!astyle --style=gnu --suffix=none %"
+" elseif &filetype == 'py'|| &filetype == 'python'
+" exec "!autopep8 --in-place --aggressive %"
+" elseif &filetype == 'java'
+" exec "!astyle --style=java --suffix=none %"
+" elseif &filetype == 'jsp'
+" exec "!astyle --style=gnu --suffix=none %"
+" elseif &filetype == 'xml'
+" exec "!astyle --style=gnu --suffix=none %"
+" else
+" exec "normal gg=G"
+" return
+" endif
+" endfunc
+
+"---------------------------------------------------------------------------
+"vim-NerdCommenter
+"---------------------------------------------------------------------------
+Bundle 'scrooloose/nerdcommenter'
+" 注释的时候自动加个空格, 强迫症必配
+let g:NERDSpaceDelims=1
+
+"---------------------------------------------------------------------------
+"vim-ctrlp
+"---------------------------------------------------------------------------
+Plugin 'kien/ctrlp.vim'
+let g:ctrlp_map = '<leader>p'
+let g:ctrlp_cmd = 'CtrlP'
+map <leader>f :CtrlPMRU<CR>
+let g:ctrlp_custom_ignore = {
+						\ 'dir':  '\v[\/]\.(git|hg|svn|rvm)$',
+						\ 'file': '\v\.(exe|so|dll|zip|tar|tar.gz|pyc)$',
+						\ }
+let g:ctrlp_working_path_mode=0
+let g:ctrlp_match_window_bottom=1
+let g:ctrlp_max_height=15
+let g:ctrlp_match_window_reversed=0
+let g:ctrlp_mruf_max=500
+let g:ctrlp_follow_symlinks=1
