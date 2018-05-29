@@ -53,7 +53,7 @@ endfunction
 
 function Run()
 		if &filetype == 'cpp'
-				exec "!time ./%<.out"
+				exec "!time ./%<"
 		elseif &filetype == 'tex'
 				exec "!okular './%<.pdf'"
 		elseif &filetype == 'java'
@@ -72,6 +72,7 @@ endfunction
 set hlsearch
 set mouse=a
 set smartindent
+set shiftwidth=4 
 set fdm=marker
 set number
 set tabstop=4
@@ -92,7 +93,7 @@ map <F2> :NERDTreeToggle<CR>
 nmap <F4> :TagbarToggle<CR>
 map <F5> : call Debug() <CR>
 map <F6> : call Run() <CR>
-map <F7> : ! python % <CR>
+map <F7> : ! python3 % <CR>
 map <F8> : call Compile() <CR>
 noremap <F9> :Autoformat<CR>
 map <F12> : ! subl ./% <CR>
@@ -187,23 +188,6 @@ let g:tagbar_width=35
 let g:tagbar_autofocus=1
 
 "---------------------------------------------------------------------------
-"vim-solarized
-"---------------------------------------------------------------------------
-colorscheme solarized
-if has('gui_running')
-		set background=light
-else
-		set background=dark
-endif
-
-"---------------------------------------------------------------------------
-"vim-markdown
-"---------------------------------------------------------------------------
-Plugin 'godlygeek/tabular'
-Plugin 'plasticboy/vim-markdown'
-Plugin 'suan/vim-instant-markdown'
-
-"---------------------------------------------------------------------------
 "vim-autoformat
 "---------------------------------------------------------------------------
 Plugin 'Chiel92/vim-autoformat'
@@ -211,39 +195,10 @@ let g:autmformat_verbosemode=1
 let g:formatdef_google = '"astyle --style=google --indent=spaces=4 --pad-oper --suffix=none"'
 let g:formatters_cpp = ['google']
 let g:formatters_c = ['google']
-let g:formatdef_autopep8 ='"autopep8 --in-place --aggressive --aggressive"'
-let g:formatters_python = ['autopep8']
 
-au BufNewFile,BufRead *.py
-						\ set tabstop=4 |
-						\ set softtabstop=4 |
-						\ set shiftwidth=4 |
-						\ set textwidth=79 |
-						\ set expandtab |
-						\ set autoindent |
-						\ set fileformat=unix
-
-" func! FormatCode()
-" exec "w"
-" if &filetype == 'c' || &filetype == 'h'
-" exec "!astyle --style=google --pad-oper  --indent=spaces=4 --suffix=none %"
-" elseif &filetype == 'cpp' || &filetype == 'cc' || &filetype == 'hpp'
-" exec "!astyle --style=google --pad-oper  --indent=spaces=4 --suffix=none %"
-" elseif &filetype == 'perl'
-" exec "!astyle --style=gnu --suffix=none %"
-" elseif &filetype == 'py'|| &filetype == 'python'
-" exec "!autopep8 --in-place --aggressive %"
-" elseif &filetype == 'java'
-" exec "!astyle --style=java --suffix=none %"
-" elseif &filetype == 'jsp'
-" exec "!astyle --style=gnu --suffix=none %"
-" elseif &filetype == 'xml'
-" exec "!astyle --style=gnu --suffix=none %"
-" else
-" exec "normal gg=G"
-" return
-" endif
-" endfunc
+let g:autoformat_autoindent = 0
+let g:autoformat_retab = 0
+let g:autoformat_remove_trailing_spaces = 0
 
 "---------------------------------------------------------------------------
 "vim-NerdCommenter
